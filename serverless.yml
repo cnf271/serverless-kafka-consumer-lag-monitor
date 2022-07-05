@@ -1,0 +1,28 @@
+service: kafka-consumer-lag-monitor
+
+useDotenv: true
+
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: java8
+  lambdaHashingVersion: 20201221
+  region: eu-west-2
+
+package:
+  artifact: target/kafka-consumer-lag-monitor.jar
+
+functions:
+  kafkaConsumerLagMonitor:
+    handler: com.cnf271.serverless.kafka.handler.KafkaConsumerLagMonitorHandler
+    timeout: 180
+    events:
+      - schedule: rate(5 minutes)
+    environment:
+      FUNCTION_NAME: kafkaConsumerLagMonitor
+      SLACK_WEBHOOK_URL: ${env:SLACK_WEBHOOK_URL}
+      LAG_THRESHOLD: ${env:LAG_THRESHOLD}
+      KAFKA_CLUSTER_ID: ${env:KAFKA_CLUSTER_ID}
+      KAFKA_MONITOR_API_KEY: ${env:KAFKA_MONITOR_API_KEY}
+      KAFKA_MONITOR_SECRET_KEY: ${env:KAFKA_MONITOR_SECRET_KEY}
